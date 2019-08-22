@@ -164,7 +164,7 @@ public class DefaultMainService implements MainService {
      *
      * @throws JsonProcessingException if {@link UserDTO#lastAdded} is malformed.
      */
-    @Scheduled(fixedRate = 60 * 60 * 1000) // run every hour, whether last run is finished or not
+    @Scheduled(fixedRate = 3 * 60 * 60 * 1000) // run every  3 hour, whether last run is finished or not
     private void processGists() throws JsonProcessingException {
         logger.info("Started processing users...");
         for (UserDTO userDTO : users) {
