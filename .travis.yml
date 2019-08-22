@@ -11,7 +11,7 @@ services:
 env:
   global:
     - GOOGLE_APPLICATION_CREDENTIALS=~/gcloud-service-key.json
-    - PROJECT_NAME=javad
+    - PROJECT_NAME=javad-250512
     - CLUSTER_NAME=pipedrive-cluster
     - CLOUDSDK_COMPUTE_ZONE=us-central1-a
 
