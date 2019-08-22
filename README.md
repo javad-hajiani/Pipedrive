@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/javad-hajiani/Pipedrive.svg?branch=master)](https://travis-ci.org/javad-hajiani/Pipedrive)
+
 ## Requirements
 This application uses JDK 1.8 .`JAVA_HOME` environment variable must be set properly.
 Also before running please add your PipeDrive api token to `PIPEDRIVE_TOKEN` environment variable. Otherwise application would not start.
