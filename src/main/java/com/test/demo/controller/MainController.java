@@ -1,9 +1,12 @@
 package com.test.demo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.test.demo.UserAlreadyExistsException;
 import com.test.demo.dto.UserDTO;
 import com.test.demo.service.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,24 +35,28 @@ public class MainController {
      * Endpoint to add users for screening.
      *
      * @param username Username of the new user.
-     * @return Http 200 if successful.
+     * @return Http 201 (Created) if successful, 400 if duplicate username.
      */
-    @PostMapping("/add-user")
+    @PostMapping(value = "/add-user", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity addUser(@RequestParam String username) {
-        mainService.addUser(username);
-        return ResponseEntity.ok().build();
+        try {
+            mainService.addUser(username);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     /**
      * Endpoint to delete users from screening.
      *
-     * @param username Username of the new user.
-     * @return Http 200 if successful.
+     * @param username Username of the user to be deleted.
+     * @return Http 202 (Accepted) if successful.
      */
-    @DeleteMapping("/delete-user")
-    public ResponseEntity deleteUser(@RequestParam String username) {
+    @DeleteMapping(value = "/delete-user/{username}")
+    public ResponseEntity deleteUser(@PathVariable String username) {
         mainService.removeUser(username);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     /**
@@ -69,7 +76,7 @@ public class MainController {
      * @return a all gists since last visit.
      * @throws JsonProcessingException if {@link UserDTO#lastVisit} is malformed.
      */
-    @GetMapping("/gists/{username}")
+    @GetMapping(path = "/{username}/gists")
     public ResponseEntity getUserGists(@PathVariable(name = "username") String username) throws JsonProcessingException {
         return ResponseEntity.ok(mainService.getRawUserGists(username));
     }

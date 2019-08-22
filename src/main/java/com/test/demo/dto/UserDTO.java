@@ -1,11 +1,12 @@
 package com.test.demo.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * DTO to hold values user information.
  */
-public class UserDTO {
+public class UserDTO implements Serializable {
 
     /**
      * Username of the user.
@@ -64,5 +65,14 @@ public class UserDTO {
      */
     public void setLastVisit(Date lastVisit) {
         this.lastVisit = lastVisit;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", lastVisit=" + lastVisit +
+                ", lastAdded=" + lastAdded +
+                '}';
     }
 }

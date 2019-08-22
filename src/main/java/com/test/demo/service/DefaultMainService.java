@@ -3,6 +3,7 @@ package com.test.demo.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.test.demo.UserAlreadyExistsException;
 import com.test.demo.dto.GistDto;
 import com.test.demo.dto.PipeDriveResponse;
 import com.test.demo.dto.UserDTO;
@@ -18,6 +19,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -50,9 +54,9 @@ public class DefaultMainService implements MainService {
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     /**
-     * A list containing all user being screened.
+     * A Set containing all user being screened.
      */
-    private List<UserDTO> users = new ArrayList<>();
+    private Set<UserDTO> users = new HashSet<>();
 
     /**
      * Constructor.
@@ -65,19 +69,52 @@ public class DefaultMainService implements MainService {
     }
 
     /**
-     * Add user to {@link #users} list.
-     *
-     * @param username name of the new user.
+     * Handler to run right after construction of this class.
+     * Used to load users data.
      */
-    @Override
-    public void addUser(String username) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername(username);
-        users.add(userDTO);
+    @PostConstruct
+    private void postConstruct() {
+        try {
+            loadUsersFromFile();
+            logger.info("Loaded user data from file.");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error loading users from file ", e);
+        }
     }
 
     /**
-     * Remove user from {@link #users} list.
+     * Handler to run just before destruction of this class.
+     * Used to save users data.
+     */
+    @PreDestroy
+    private void preDestroy() {
+        try {
+            saveUsersAsFile();
+            logger.info("Saved user data to file.");
+        } catch (IOException e) {
+            logger.error("Error saving users to file ", e);
+        }
+    }
+
+    /**
+     * Add user to {@link #users} if it does not exist.
+     *
+     * @param username name of the new user.
+     * @throws UserAlreadyExistsException when username is already added.
+     */
+    @Override
+    public void addUser(String username) throws UserAlreadyExistsException {
+        if (users.stream().noneMatch(userDTO -> userDTO.getUsername().equalsIgnoreCase(username))) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUsername(username);
+            users.add(userDTO);
+        }else {
+            throw new UserAlreadyExistsException("Username already exists");
+        }
+    }
+
+    /**
+     * Remove user from {@link #users}.
      *
      * @param username username of the user to be removed.
      */
@@ -87,13 +124,14 @@ public class DefaultMainService implements MainService {
     }
 
     /**
-     * Return all users from {@link #users} list.
+     * Return all users from {@link #users}.
+     * Note that this returns a copy of users, not a reference.
      *
      * @return {@code users}.
      */
     @Override
-    public List<UserDTO> getUsers() {
-        return users;
+    public Set<UserDTO> getUsers() {
+        return new HashSet<>(users);
     }
 
     /**
@@ -105,7 +143,6 @@ public class DefaultMainService implements MainService {
      */
     @Override
     public String getRawUserGists(String username) throws JsonProcessingException {
-
         Optional<UserDTO> first = users.stream().filter(userDTO -> userDTO.getUsername().equalsIgnoreCase(username)).findFirst();
         if (!first.isPresent()) return "";
         UserDTO userDTO = first.get();
@@ -115,7 +152,9 @@ public class DefaultMainService implements MainService {
         }
         String url = getGitHubUrl(username, since);
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-        users.get(users.indexOf(userDTO)).setLastVisit(new Date());
+        users.remove(userDTO);
+        userDTO.setLastVisit(new Date());
+        users.add(userDTO);
         return responseEntity.getBody();
     }
 
@@ -125,22 +164,30 @@ public class DefaultMainService implements MainService {
      *
      * @throws JsonProcessingException if {@link UserDTO#lastAdded} is malformed.
      */
-    @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every four hours, whether last run is finished or not
-    private void callExternalServices() throws JsonProcessingException {
+    @Scheduled(fixedRate = 60 * 60 * 1000) // run every hour, whether last run is finished or not
+    private void processGists() throws JsonProcessingException {
+        logger.info("Started processing users...");
         for (UserDTO userDTO : users) {
+            logger.info("/**********************************");
             String since = "";
             if (userDTO.getLastAdded() != null) {
                 since = mapper.writeValueAsString(userDTO.getLastAdded());
             }
             List<GistDto> gistDtos = getGitHubGists(userDTO.getUsername(), since);
-
+            logger.info("User: "+userDTO);
+            logger.info("Gists count since last visit: {}",gistDtos.size());
             for (GistDto gistDto : gistDtos) {
                 if (!addPipeDriveActivity(gistDto.getId(), gistDto.getUrl())) {
                     logger.error(String.format("Error adding activity for gist id:%s", gistDto.getId()));
+                }else {
+                    logger.info("Pipe Drive activity added.");
                 }
             }
             userDTO.setLastAdded(new Date());
+            logger.info("**********************************/");
+
         }
+        logger.info("Ended processing users...");
     }
 
     /**
@@ -192,5 +239,30 @@ public class DefaultMainService implements MainService {
             url = url.concat("?since=").concat(since);
         }
         return url;
+    }
+
+    /**
+     * A simple way to persist current user data to a local file.
+     *
+     * @throws IOException if file does not exist.
+     */
+    private void saveUsersAsFile() throws IOException {
+        FileOutputStream fos = new FileOutputStream("users.data");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(users);
+        oos.close();
+    }
+
+    /**
+     * Load users data from file.
+     *
+     * @throws IOException            if file is not found or corrupt.
+     * @throws ClassNotFoundException if {@link UserDTO} is not found/loaded.
+     */
+    private void loadUsersFromFile() throws IOException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream("users.data");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        users = (Set<UserDTO>) ois.readObject();
+        ois.close();
     }
 }
