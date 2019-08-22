@@ -22,9 +22,6 @@ before_install:
   - gcloud --quiet components update
   - gcloud --quiet components update beta
 
-install:
-  - docker build -t 'javad/pipedrive:latest' .
-
 script:
   - ./mvnw test
 
