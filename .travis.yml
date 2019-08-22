@@ -11,9 +11,9 @@ services:
 env:
   global:
     - GOOGLE_APPLICATION_CREDENTIALS=~/gcloud-service-key.json
-    - PROJECT_NAME=pipedrive
-    - CLUSTER_NAME=javadtestcluster
-    - CLOUDSDK_COMPUTE_ZONE=us
+    - PROJECT_NAME=javad
+    - CLUSTER_NAME=pipedrive-cluster
+    - CLOUDSDK_COMPUTE_ZONE=us-central1-a
 
 before_install:
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
@@ -30,7 +30,7 @@ before_deploy:
 
 deploy:
   - provider: script
-    script: ./resources/deploy.sh
+    script: ./deployment/deploy.sh
     skip_cleanup: true
     on:
       branch: master
