@@ -18,6 +18,9 @@ spec:
           image: gcr.io/PROJECTNAME/pipedrive:TRAVIS_COMMIT
           ports:
             - containerPort: 8080
+          env:
+          - name: PIPEDRIVE_TOKEN
+            value: PIPEDRIVETOKEN
 ---
 apiVersion: v1
 kind: Service
