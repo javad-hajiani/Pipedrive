@@ -13,7 +13,7 @@ Application listens on port `8080`.
 ## Notes
 * My understanding of the task is that for each gist there should be an activity **OR** a deal. And since creating a deal for a gist did not make sense to me, I decided to make an activity.
 * From the task I understood that _user_ was a local concept, so I did not create a Pipe Drive `Person` or `User` for the users being screened.
-* `DefaultMainService.processGists()` will query new gists for all users in the screening list every hour and add a Pipe Drive activity for each gist.
+* `DefaultMainService.processGists()` will query new gists for all users in the screening list every 3 hours and add a Pipe Drive activity for each gist.
 * The Screening list is the only information worth keeping and using a database for that purpose would only complicate the code. Therefore a simple file is used to keep track of the list. File content is loaded upon service construction and will be overwritten before service destruction. 
 * The `users.data` file in the base directory contains the data of users. Removal of this file would result in loss of that data. Application will overwrite the data in this file.
 
