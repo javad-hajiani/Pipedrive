@@ -1,0 +1,33 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: pipedrive-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipedrive
+
+  template:
+    metadata:
+      labels:
+        app: pipedrive
+    spec:
+      containers:
+        - name: pipedrive
+          image: gcr.io/PROJECTNAME/pipedrive:TRAVIS_COMMIT
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipedrive-service
+spec:
+  selector:
+    app: pipedrive
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

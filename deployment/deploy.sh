@@ -20,5 +20,7 @@ yes | gcloud beta container images add-tag gcr.io/${PROJECT_NAME}/pipedrive:$TRA
 
 kubectl config view
 kubectl config current-context
-
-kubectl get nodes
+sed -i "s/PROJECTNAME/$PROJECT_NAME/g" pipedrive-gke-deployment.yml
+sed -i "s/TRAVIS_COMMIT/$TRAVIS_COMMIT/g" pipedrive-gke-deployment.yml
+kubectl apply -f pipedrive-gke-deployment.yml
+echo "Deployed Successfully!!!"
