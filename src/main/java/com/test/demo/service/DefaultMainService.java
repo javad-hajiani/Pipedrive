@@ -78,7 +78,7 @@ public class DefaultMainService implements MainService {
             loadUsersFromFile();
             logger.info("Loaded user data from file.");
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error loading users from file ", e);
+            logger.error("Error loading users from file. (Is this first run?) ");
         }
     }
 
@@ -92,7 +92,7 @@ public class DefaultMainService implements MainService {
             saveUsersAsFile();
             logger.info("Saved user data to file.");
         } catch (IOException e) {
-            logger.error("Error saving users to file ", e);
+            logger.error("Error saving users to file. Changes are lost.");
         }
     }
 
