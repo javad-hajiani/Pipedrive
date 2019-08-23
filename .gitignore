@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### terraform gcp credential ###
+./deployment/iac/creds/*
