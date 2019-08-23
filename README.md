@@ -11,7 +11,7 @@ Also before running please add your PipeDrive api token to `PIPEDRIVE_TOKEN` env
 ### How to run
 There is two way to run application on your own system . 
 
-###### Method 1:
+##### Method 1:
 This application able to run from docker so you can run it with below command and it will run on your system :) .
 
  > `docker-compose up -d`
@@ -19,7 +19,7 @@ This application able to run from docker so you can run it with below command an
 Application listens on port `8080`.
 
 
-###### Method 2:
+##### Method 2:
 
 This spring boot application uses maven wrapper, so there is no need to download maven.
 
@@ -53,7 +53,7 @@ private **ENVIRONMENT VARIABLES** on it. I have been choose travis because I kno
 
 I wrote some unit tests which cover my application functionalities so I run it in CI section and after that Deploy it to **GKE**(Google Cloud Kubernetes Service).
 
-There is no need to manual work to deploy, if you merge or commit to master branch it will test and deploy on cloud, In this project I used github flow also after successful/failure deployment we receive email for it
+**NOTE:** There is no need to manual work to deploy, if you merge or commit to master branch it will test and deploy on cloud, In this project I used github flow also after successful/failure deployment we receive email for it
 
 # Part III - The cloud
 
@@ -63,11 +63,11 @@ I have chosen kubernetes for infrastructure because it helps us make our applica
 ### Infrastructure as Code
 I choose Terraform for provision our infrastructure because it has big community and it's stable to now.
 Actually we have no manual work even for implement our production environment, here we go
-###### Step 1 ( Install Terraform ):
+##### Step 1 ( Install Terraform ):
 Download terraform from below link and extend path to your bash path variable
 <a href="https://www.terraform.io/downloads.html">**Download HERE**</a>
 
-###### Step 2 ( Download Google Cloud Service Key and Enable kubernetes API ):
+##### Step 2 ( Download Google Cloud Service Key and Enable kubernetes API ):
 We need a way for the Terraform runtime to authenticate with the GCP API so go to the 
 **Cloud Console**, navigate to **IAM & Admin** > **Service Accounts**, and click Create Service Account with Project Editor role. 
 Your browser will download a JSON file containing the details of the service account and a private key that can authenticate as a project editor to your project. 
@@ -76,9 +76,11 @@ Keep this JSON file safe!
 cd deployment/iac
 mkdir creds
 cp DOWNLOADEDSERVICEKEY.json creds/serviceaccount.json
+```
+##### Step 3 ( Deploy GKE Cluster )
+Set your project name and location in `provider.tf` and `.travis.yml` then Deploy
+```bash
 terraform apply
 ```
 
-If you have questions Feel free to ask
-Thanks 
-
+if you have any question feel free to ask
