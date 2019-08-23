@@ -25,4 +25,5 @@ sed -i "s/TRAVIS_COMMIT/$TRAVIS_COMMIT/g" ./deployment/pipedrive-gke-deployment.
 sed -i "s/PIPEDRIVETOKEN/$PIPEDRIVE_TOKEN/g" ./deployment/pipedrive-gke-deployment.yml
 
 kubectl apply -f ./deployment/pipedrive-gke-deployment.yml
+kubectl get svc pipedrive-service
 echo "Deployed Successfully!!!"
