@@ -4,7 +4,7 @@ COPY src /app/src
 RUN mvn -DskipTests -f /app/pom.xml clean package
 
 FROM openjdk:8u212-jre-alpine3.9
-ENV USER_DATA_DIR="/opt/"
 COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
 EXPOSE 8080
+WORKDIR /app
 ENTRYPOINT ["java","-jar","/app/demo.jar"]
