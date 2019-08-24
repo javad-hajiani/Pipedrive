@@ -53,7 +53,7 @@ private **ENVIRONMENT VARIABLES** on it. I have been choose travis because I kno
 
 I wrote some unit tests which cover my application functionalities so I run it in CI section and after that Deploy it to **GKE**(Google Cloud Kubernetes Service) if tests were successful.
 
-**NOTE:** There is no need to manual work to deploy, if you merge or commit to master branch it will test and deploy on cloud, In this project I used github flow also after successful/failure deployment we receive email for it
+**NOTE:** There is no need to manual work to deploy, if you merge or commit to master branch it will test and deploy on cloud and if you push to development branch it just run tests and show in merge request status, In this project I used github flow also after successful/failure deployment we receive email for it
 
 # Part III - The cloud
 
