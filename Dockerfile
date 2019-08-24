@@ -1,7 +1,8 @@
 FROM maven:3.6.1-jdk-8-alpine AS builder
+RUN mkdir /app
 COPY pom.xml /app
 COPY src /app/src
-RUN mvn -DskipTests -f /app/pom.xml clean package
+RUN mvn -DskipTests -f /app/pom.xml package
 
 FROM openjdk:8u212-jre-alpine3.9
 COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
