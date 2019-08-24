@@ -32,6 +32,15 @@ public class MainController {
     }
 
     /**
+     * Endpoint to index page.
+     *
+     * @return Http 200 (Ok) if successful.
+     */
+    @GetMapping(value = "/",produces = "application/json")
+    public ResponseEntity<String> index() {
+        return new ResponseEntity<>("{\"status\" : \"UP\"}", HttpStatus.OK);
+    }
+    /**
      * Endpoint to add users for screening.
      *
      * @param username Username of the new user.
@@ -76,7 +85,7 @@ public class MainController {
      * @return a all gists since last visit.
      * @throws JsonProcessingException if {@link UserDTO#lastVisit} is malformed.
      */
-    @GetMapping(path = "/{username}/gists")
+    @GetMapping(path = "/{username}/gists",produces = "application/json")
     public ResponseEntity getUserGists(@PathVariable(name = "username") String username) throws JsonProcessingException {
         return ResponseEntity.ok(mainService.getRawUserGists(username));
     }
