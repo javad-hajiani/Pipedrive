@@ -51,7 +51,7 @@ also if you feel the need to more details you are able to generate javadoc to ge
 I used travis for CI/CD process and defined `PIPEDRIVE_TOKEN` and `GCLOUD_SERVICE_KEY` 
 private **ENVIRONMENT VARIABLES** on it. I have been choose travis because I know it better than else and it meets bonus point by itself but we can trigger other CI/CD tool like (Jenkins) with webhooks in GITHUB.
 
-I wrote some unit tests which cover my application functionalities so I run it in CI section and after that Deploy it to **GKE**(Google Cloud Kubernetes Service).
+I wrote some unit tests which cover my application functionalities so I run it in CI section and after that Deploy it to **GKE**(Google Cloud Kubernetes Service) if tests were successful.
 
 **NOTE:** There is no need to manual work to deploy, if you merge or commit to master branch it will test and deploy on cloud, In this project I used github flow also after successful/failure deployment we receive email for it
 
